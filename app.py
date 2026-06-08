@@ -1,11 +1,9 @@
 import streamlit as st
 import pandas as pd
 import joblib
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 st.set_page_config(page_title="Stunting Risk Predictor", layout="wide")
-st.title("🧒 Prediksi Risiko Stunting Anak")
+st.title("🧒 Prediksi Risiko Stunting")
 st.markdown("**LAB IS411 Data Modelling - Kelompok UTS**")
 
 # Load Model
@@ -15,8 +13,8 @@ def load_model():
 
 model = load_model()
 
-# Input Sidebar
-st.sidebar.header("Masukkan Data Negara")
+# Input
+st.sidebar.header("Input Data")
 
 col1, col2 = st.columns(2)
 
@@ -31,7 +29,7 @@ with col2:
     female_lit = st.slider("Female Literacy Rate (%)", 10.0, 100.0, 85.0)
     male_lit = st.slider("Male Literacy Rate (%)", 10.0, 100.0, 90.0)
 
-# Prediksi
+# Tombol Prediksi
 if st.button("🔍 Prediksi Risiko Stunting", type="primary"):
     input_df = pd.DataFrame({
         'Stunting_Prevalence': [stunting_prev],
@@ -47,16 +45,18 @@ if st.button("🔍 Prediksi Risiko Stunting", type="primary"):
     prob = model.predict_proba(input_df)[0]
     
     risk = {0: "🟢 Rendah", 1: "🟡 Sedang", 2: "🔴 Tinggi"}
-    
-    st.success(f"**Hasil Prediksi: {risk[pred]}**")
+    st.success(f"**Risiko Stunting: {risk[pred]}**")
     
     st.bar_chart({
-        "Rendah": prob[0],
-        "Sedang": prob[1],
-        "Tinggi": prob[2]
+        "Rendah": [prob[0]],
+        "Sedang": [prob[1]],
+        "Tinggi": [prob[2]]
     })
 
-# Tampilkan Dataset
+# Dataset
 st.subheader("Dataset Overview")
-df = pd.read_csv("Child_Malnutrition_with_Socioeconomic_Factors_dataset.csv")
-st.dataframe(df.head(10))
+try:
+    df = pd.read_csv("Child_Malnutrition_with_Socioeconomic_Factors_dataset.csv")
+    st.dataframe(df.head(10))
+except:
+    st.warning("Dataset tidak ditemukan.")
