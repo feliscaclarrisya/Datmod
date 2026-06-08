@@ -13,7 +13,7 @@ def load_model():
 
 model = load_model()
 
-# Input
+# Tampilkan nama fitur yang diharapkan model
 st.sidebar.header("Input Data Negara")
 
 col1, col2 = st.columns(2)
@@ -31,10 +31,10 @@ with col2:
 
 # Tombol Prediksi
 if st.button("🔍 Prediksi Risiko Stunting", type="primary"):
-    # Kolom harus persis sama dengan saat training model
+    # Harus persis sama dengan kolom saat training
     input_df = pd.DataFrame({
         'Stunting_Prevalence': [stunting_prev],
-        'Overweight_Prevalence': [10.0],           # dummy
+        'Overweight_Prevalence': [10.0],           # dummy value
         'GDP_per_Capita': [gdp],
         'Poverty_Rate': [poverty],
         'Fertility_Rate': [fertility],
@@ -57,7 +57,8 @@ if st.button("🔍 Prediksi Risiko Stunting", type="primary"):
             "Tinggi": [prob[2]]
         })
     except Exception as e:
-        st.error(f"Error prediksi: {str(e)}")
+        st.error(f"Error: {str(e)}")
+        st.info("Coba cek urutan kolom di model.")
 
 # Dataset
 st.subheader("Dataset Overview")
