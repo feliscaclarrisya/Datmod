@@ -13,8 +13,8 @@ def load_model():
 
 model = load_model()
 
-# Input Data
-st.sidebar.header("Input Data")
+# Input
+st.sidebar.header("Input Data Negara")
 
 col1, col2 = st.columns(2)
 
@@ -31,10 +31,10 @@ with col2:
 
 # Tombol Prediksi
 if st.button("🔍 Prediksi Risiko Stunting", type="primary"):
-    # Buat DataFrame dengan urutan kolom yang persis sama saat training
+    # Kolom harus persis sama dengan saat training model
     input_df = pd.DataFrame({
         'Stunting_Prevalence': [stunting_prev],
-        'Overweight_Prevalence': [10.0],           # dummy value (kalau ada)
+        'Overweight_Prevalence': [10.0],           # dummy
         'GDP_per_Capita': [gdp],
         'Poverty_Rate': [poverty],
         'Fertility_Rate': [fertility],
@@ -43,19 +43,21 @@ if st.button("🔍 Prediksi Risiko Stunting", type="primary"):
         'Male_Literacy_Rate': [male_lit]
     })
     
-    # Prediksi
-    pred = model.predict(input_df)[0]
-    prob = model.predict_proba(input_df)[0]
-    
-    risk_map = {0: "🟢 Rendah", 1: "🟡 Sedang", 2: "🔴 Tinggi"}
-    
-    st.success(f"**Risiko Stunting: {risk_map[pred]}**")
-    
-    st.bar_chart({
-        "Rendah": prob[0],
-        "Sedang": prob[1],
-        "Tinggi": prob[2]
-    })
+    try:
+        pred = model.predict(input_df)[0]
+        prob = model.predict_proba(input_df)[0]
+        
+        risk_map = {0: "🟢 Rendah", 1: "🟡 Sedang", 2: "🔴 Tinggi"}
+        
+        st.success(f"**Risiko Stunting: {risk_map[pred]}**")
+        
+        st.bar_chart({
+            "Rendah": [prob[0]],
+            "Sedang": [prob[1]],
+            "Tinggi": [prob[2]]
+        })
+    except Exception as e:
+        st.error(f"Error prediksi: {str(e)}")
 
 # Dataset
 st.subheader("Dataset Overview")
@@ -63,4 +65,4 @@ try:
     df = pd.read_csv("Child_Malnutrition_with_Socioeconomic_Factors_dataset.csv")
     st.dataframe(df.head(10))
 except:
-    st.info("Dataset tidak ditemukan di folder.")
+    st.info("Dataset tidak ditemukan.")
