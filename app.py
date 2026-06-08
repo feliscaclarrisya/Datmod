@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import joblib
 
-st.set_page_config(page_title="Stunting Risk Predictor", layout="wide")
+st.set_page_config(page_title="Prediksi Risiko Stunting", layout="wide")
 st.title("🧒 Prediksi Risiko Stunting")
 st.markdown("**LAB IS411 Data Modelling - Kelompok UTS**")
 
@@ -13,7 +13,7 @@ def load_model():
 
 model = load_model()
 
-# Input
+# Input Data
 st.sidebar.header("Input Data")
 
 col1, col2 = st.columns(2)
@@ -31,26 +31,30 @@ with col2:
 
 # Tombol Prediksi
 if st.button("🔍 Prediksi Risiko Stunting", type="primary"):
+    # Buat DataFrame dengan urutan kolom yang persis sama saat training
     input_df = pd.DataFrame({
         'Stunting_Prevalence': [stunting_prev],
+        'Overweight_Prevalence': [10.0],           # dummy value (kalau ada)
+        'GDP_per_Capita': [gdp],
         'Poverty_Rate': [poverty],
         'Fertility_Rate': [fertility],
-        'GDP_per_Capita': [gdp],
         'Urban_Population_Percent': [urban],
         'Female_Literacy_Rate': [female_lit],
         'Male_Literacy_Rate': [male_lit]
     })
     
+    # Prediksi
     pred = model.predict(input_df)[0]
     prob = model.predict_proba(input_df)[0]
     
-    risk = {0: "🟢 Rendah", 1: "🟡 Sedang", 2: "🔴 Tinggi"}
-    st.success(f"**Risiko Stunting: {risk[pred]}**")
+    risk_map = {0: "🟢 Rendah", 1: "🟡 Sedang", 2: "🔴 Tinggi"}
+    
+    st.success(f"**Risiko Stunting: {risk_map[pred]}**")
     
     st.bar_chart({
-        "Rendah": [prob[0]],
-        "Sedang": [prob[1]],
-        "Tinggi": [prob[2]]
+        "Rendah": prob[0],
+        "Sedang": prob[1],
+        "Tinggi": prob[2]
     })
 
 # Dataset
@@ -59,4 +63,4 @@ try:
     df = pd.read_csv("Child_Malnutrition_with_Socioeconomic_Factors_dataset.csv")
     st.dataframe(df.head(10))
 except:
-    st.warning("Dataset tidak ditemukan.")
+    st.info("Dataset tidak ditemukan di folder.")
