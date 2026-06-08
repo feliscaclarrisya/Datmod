@@ -1,4 +1,0 @@
-import joblib
-
-joblib.dump(models["Random Forest"], 'stunting_rf_model.pkl')
-print("✅ Model berhasil disimpan!")
