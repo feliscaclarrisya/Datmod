@@ -7,13 +7,8 @@ st.title("🧒 Prediksi Risiko Stunting")
 st.markdown("**LAB IS411 Data Modelling - Kelompok UTS**")
 
 # Load Model
-@st.cache_resource
-def load_model():
-    return joblib.load('stunting_rf_model.pkl')
+model = joblib.load('stunting_rf_model.pkl')
 
-model = load_model()
-
-# Tampilkan nama fitur yang diharapkan model
 st.sidebar.header("Input Data Negara")
 
 col1, col2 = st.columns(2)
@@ -26,39 +21,31 @@ with col1:
 
 with col2:
     urban = st.slider("Urban Population (%)", 10.0, 100.0, 60.0)
-    female_lit = st.slider("Female Literacy Rate (%)", 10.0, 100.0, 85.0)
     male_lit = st.slider("Male Literacy Rate (%)", 10.0, 100.0, 90.0)
 
 # Tombol Prediksi
 if st.button("🔍 Prediksi Risiko Stunting", type="primary"):
-    # Harus persis sama dengan kolom saat training
     input_df = pd.DataFrame({
         'Stunting_Prevalence': [stunting_prev],
-        'Overweight_Prevalence': [10.0],           # dummy value
-        'GDP_per_Capita': [gdp],
         'Poverty_Rate': [poverty],
-        'Fertility_Rate': [fertility],
         'Urban_Population_Percent': [urban],
-        'Female_Literacy_Rate': [female_lit],
+        'GDP_per_Capita': [gdp],
+        'Fertility_Rate': [fertility],
         'Male_Literacy_Rate': [male_lit]
     })
     
-    try:
-        pred = model.predict(input_df)[0]
-        prob = model.predict_proba(input_df)[0]
-        
-        risk_map = {0: "🟢 Rendah", 1: "🟡 Sedang", 2: "🔴 Tinggi"}
-        
-        st.success(f"**Risiko Stunting: {risk_map[pred]}**")
-        
-        st.bar_chart({
-            "Rendah": [prob[0]],
-            "Sedang": [prob[1]],
-            "Tinggi": [prob[2]]
-        })
-    except Exception as e:
-        st.error(f"Error: {str(e)}")
-        st.info("Coba cek urutan kolom di model.")
+    pred = model.predict(input_df)[0]
+    prob = model.predict_proba(input_df)[0]
+    
+    risk_map = {0: "🟢 Rendah", 1: "🟡 Sedang", 2: "🔴 Tinggi"}
+    
+    st.success(f"**Risiko Stunting: {risk_map[pred]}**")
+    
+    st.bar_chart({
+        "Rendah": [prob[0]],
+        "Sedang": [prob[1]],
+        "Tinggi": [prob[2]]
+    })
 
 # Dataset
 st.subheader("Dataset Overview")
